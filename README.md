@@ -2,6 +2,7 @@
 Reads EPG data from VDR, checks against a list of desired program titles, subtitles, or descriptions, and sends found programs via mail or it to stdout.
 
 # Usage
+```
 usage: pyegnotify [-h] [--config file] [--no-cache] [--stdout]
                  [--cache-file file] [--epg-dst-file file]
 
@@ -15,4 +16,4 @@ optional arguments:
   --cache-file file    Optionally, cache file location, default
                        epgnotfiy.cache.yaml in home directory is used
   --epg-dst-file file  Store received EPG data to a file
-
+```
