@@ -47,6 +47,7 @@ def setup_parser():
         "--epg-dst-file",
         type=str,
         default=None,
+        metavar="file",
         help="Store received EPG data to a file",
     )
 
