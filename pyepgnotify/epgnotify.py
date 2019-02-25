@@ -16,7 +16,7 @@ import argparse
 def setup_parser():
 
     parser = argparse.ArgumentParser(
-        prog="Epgnotify",
+        prog="pyegnotify",
         description="Parses EPG data from VDR, checks against search config and sends mail",
     )
 
