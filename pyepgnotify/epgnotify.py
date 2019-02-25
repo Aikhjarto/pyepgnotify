@@ -1,5 +1,3 @@
-#!/bin/env python3
-
 import socket
 import os
 from pathlib import Path  # requires python 3.5
