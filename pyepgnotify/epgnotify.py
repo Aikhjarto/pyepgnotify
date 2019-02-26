@@ -255,7 +255,7 @@ def check_program(program, search_config):
     return False
 
 
-def send_email(program_list, config):
+def send_email(HTML_string, subject_string, config):
     # send email
 
     if "from_email" in config:
@@ -266,7 +266,7 @@ def send_email(program_list, config):
     receiver = config["email"]
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = "epgnotify found {} new programs for you".format(len(program_list))
+    msg["Subject"] = subject_string
     msg["From"] = sender
     msg["To"] = receiver
 
@@ -376,7 +376,8 @@ def main():
 
     # send via mail
     if "email" in config:
-        send_email(program_list, config)
+        subject_string = "epgnotify found {} new programs for you".format(len(program_list))
+        send_email(HTML_string, subject_string, config)
 
     # prevent infinitely growing cache by purging
     # programs from cache that are not in EPG data any more
