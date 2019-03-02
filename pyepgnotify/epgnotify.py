@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import socket
 import os
 from pathlib import Path  # requires python 3.5
@@ -14,7 +16,7 @@ import argparse
 def setup_parser():
 
     parser = argparse.ArgumentParser(
-        prog="pyegnotify",
+        prog="Epgnotify",
         description="Parses EPG data from VDR, checks against search config and sends mail",
     )
 
@@ -115,7 +117,7 @@ def programlist_to_html(program_list, link_base=None):
     for p in program_list:
         lst.append("<tr>")
 
-        eid, starttime, duration, tid = p["E"].split(" ")
+        eid, starttime, duration = p["E"].split(" ")
 
         duration = float(duration)
         starttime = int(starttime)
@@ -347,7 +349,7 @@ def main():
         elif hdr == "c":  # end of a channel secion
             pass
         elif hdr == "E":  # start of a new program
-            program = {"E": line[6:].rsplit(" ", 1)[0]}
+            program = {"E": line[6:].rsplit(" ", 2)[0]}
         elif hdr in "TSDGRV":  # program description
             program[hdr] = line[6:]
         elif hdr == "X":  # streams (can occur many times)
@@ -376,7 +378,10 @@ def main():
 
     # send via mail
     if "email" in config:
-        subject_string = "epgnotify found {} new programs for you".format(len(program_list))
+        subject_string = "epgnotify found {} new programs for you".format(
+            len(program_list)
+        )
+
         send_email(HTML_string, subject_string, config)
 
     # prevent infinitely growing cache by purging
@@ -385,6 +390,9 @@ def main():
 
     # add currently found programs to cache
     cache.extend(program_list)
+
+    # sort cache (makes it much easier to debug)
+    cache = sorted(cache, key=lambda k: k["E"])
 
     # write cache
     with open(cache_file, "w") as f:
