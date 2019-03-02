@@ -321,7 +321,7 @@ def main():
     # get and check VDR's greeting message
     data = read_till_msg(sock, "\n".encode())
     if not data.startswith("220 "):
-        raise Exception("Got unexpeted greeting message: " + data)
+        raise Exception("Got unexpected greeting message: " + data)
     if not data.endswith("UTF-8\r\n"):
         raise Exception("Encoding does not seem to be UTF-8")
 
