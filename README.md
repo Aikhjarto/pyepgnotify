@@ -6,7 +6,9 @@ Reads EPG data from VDR, checks against a list of desired program titles, subtit
 usage: pyegnotify [-h] [--config file] [--no-cache] [--stdout]
                  [--cache-file file] [--epg-dst-file file]
 
-Parses EPG data from VDR, checks against search config and sends mail
+Parses EPG data from VDR, checks against search config and sends mail. Already
+sent programs are stored in a cache to avoid multiple notifications on same
+program.
 
 optional arguments:
   -h, --help           show this help message and exit

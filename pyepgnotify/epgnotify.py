@@ -17,7 +17,7 @@ def setup_parser():
 
     parser = argparse.ArgumentParser(
         prog="Epgnotify",
-        description="Parses EPG data from VDR, checks against search config and sends mail",
+        description="Parses EPG data from VDR, checks against search config and sends mail. Already sent programs are stored in a cache to avoid multiple notifications on same program.",
     )
 
     parser.add_argument(
@@ -38,7 +38,7 @@ def setup_parser():
         "--cache-file",
         type=str,
         metavar="file",
-        help="Optionally, cache file location, default epgnotfiy.cache.yaml in home directory is used",
+        help="Optionally, cache file location, default epgnotfiy.cache.yaml in home directory is used. Use /dev/null to disable caching.",
     )
 
     parser.add_argument(
