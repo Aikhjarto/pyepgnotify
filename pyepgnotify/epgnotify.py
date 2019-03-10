@@ -28,13 +28,6 @@ def setup_parser():
     )
 
     parser.add_argument(
-        "--no-cache",
-        action="store_true",
-        default=False,
-        help="If given, caching is disabled (suitable for debugging)",
-    )
-
-    parser.add_argument(
         "--stdout",
         action="store_true",
         default=False,
