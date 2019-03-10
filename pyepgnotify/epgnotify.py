@@ -223,6 +223,10 @@ def check_program(program, search_config):
         # title detection with blacklist
         if type(t) == dict and t["intitle"] in T:
             # if search has subtitle blacklist and program has subtitle
+            if "notintitle" in t:
+                for notintitle in t["notintitle"]:
+                    if notintitle in T:
+                        return False
             if "notinsubtitle" in t and "S" in program:
                 for nosub in t["notinsubtitle"]:
                     if nosub in program["S"]:
