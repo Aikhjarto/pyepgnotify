@@ -20,7 +20,12 @@ def setup_parser():
         description="Parses EPG data from VDR, checks against search config and sends mail",
     )
 
-    parser.add_argument("--config", type=str, metavar="file", help="Config file")
+    parser.add_argument(
+        "--config",
+        type=str,
+        metavar="file",
+        help="Config file. If not given ~/epgnotify.yml is used.",
+    )
 
     parser.add_argument(
         "--no-cache",

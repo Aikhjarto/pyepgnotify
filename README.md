@@ -10,7 +10,7 @@ Parses EPG data from VDR, checks against search config and sends mail
 
 optional arguments:
   -h, --help           show this help message and exit
-  --config file        Config file
+  --config file        Config file. If not given ~/epgnotify.yml is used.
   --no-cache           If given, caching is disabled (suitable for debugging)
   --stdout             Additionally print result to stdout
   --cache-file file    Optionally, cache file location, default
