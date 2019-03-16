@@ -8,7 +8,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="pyepgnotify",
-    version="0.1.1",
+    version="0.1.2",
     license="GPLv3",
     url="https://github.com/Aikhjarto/pyepgnotify.git",
     download_url="https://github.com/Aikhjarto/pyepgnotify/archive/v0.1.1.tar.gz",
