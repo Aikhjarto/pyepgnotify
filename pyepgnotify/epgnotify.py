@@ -75,7 +75,8 @@ def read_till_msg(sock, msg):
         d += data
         if d.endswith(msg):
             break
-    return d.decode("utf-8")
+
+    return d.decode("utf-8",'backslashreplace')
 
 
 def programlist_to_html(program_list, link_base=None):
@@ -126,7 +127,7 @@ def programlist_to_html(program_list, link_base=None):
         starttime = time.asctime(time.localtime(starttime))
         # add channel info
         cid, cname = p["C"].split(" ", 1)
-        s = "<td>{}<br><b>{}</b></td>".format(cid, cname)
+        s = "<td>{}<br><b>{}</b><br>{}</td>".format(cid, cname, eid)
         lst.append(s)
 
         # add program info
