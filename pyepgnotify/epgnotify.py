@@ -76,7 +76,7 @@ def read_till_msg(sock, msg):
         if d.endswith(msg):
             break
 
-    return d.decode("utf-8",'backslashreplace')
+    return d.decode("utf-8", "backslashreplace")
 
 
 def programlist_to_html(program_list, link_base=None):
