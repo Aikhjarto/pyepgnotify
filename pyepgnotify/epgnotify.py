@@ -64,6 +64,30 @@ def norm_str(s):
     return NFD(NFD(s).casefold())
 
 
+def norm_str_in(s1, s2):
+    """
+    Checks if string s1 is in s2. Check is done after normalization and casefolding.
+
+    Returns
+    -------
+    bool:
+        True if string s1 can be found in s2
+    """
+
+    return norm_str(s1) in norm_str(s2)
+
+
+def norm_str_eq(s1, s2):
+    """
+    Checks if string s1 and s2 are equal. Check is done after normalization and casefolding.
+
+    Returns
+    ------
+    bool:
+        True if strings are equal after normalization and casefolding.
+    """
+
+
 def read_till_msg(sock, msg):
     """
     Reads from socket until stream ends in msg.
