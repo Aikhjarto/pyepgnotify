@@ -51,6 +51,15 @@ def setup_parser():
 
     return parser
 
+def norm_str(s):
+    """
+    Normalizes UTF-8 string for case-insensitive string comparison.
+    See: https://docs.python.org/3/howto/unicode.html
+    """
+    def NFD(s):
+        return unicodedata.normalize('NFD', s)
+
+    return NFD(NFD(s).casefold())
 
 def read_till_msg(sock, msg):
     """
