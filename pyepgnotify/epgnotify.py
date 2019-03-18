@@ -51,15 +51,18 @@ def setup_parser():
 
     return parser
 
+
 def norm_str(s):
     """
     Normalizes UTF-8 string for case-insensitive string comparison.
     See: https://docs.python.org/3/howto/unicode.html
     """
+
     def NFD(s):
-        return unicodedata.normalize('NFD', s)
+        return unicodedata.normalize("NFD", s)
 
     return NFD(NFD(s).casefold())
+
 
 def read_till_msg(sock, msg):
     """
@@ -86,6 +89,74 @@ def read_till_msg(sock, msg):
             break
 
     return d.decode("utf-8", "backslashreplace")
+
+
+def get_epg_data(config):
+    """
+    Reads EPG data via SVDRP from VDR using the command 'LSTE'.
+
+    Returns
+    -------
+    str:
+        VDR's output to the'LSTE' command as string.
+
+    """
+    # make socket connection to VDR
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host = config["vdrhost"]
+    port = config["vdrport"]
+    sock.connect((host, port))
+    sock.settimeout(10)
+
+    # get and check VDR's greeting message
+    data = read_till_msg(sock, "\n".encode())
+    if not data.startswith("220 "):
+        raise Exception("Got unexpected greeting message: " + data)
+    if not data.endswith("UTF-8\r\n"):
+        raise Exception("Encoding does not seem to be UTF-8")
+
+    # request EPG data
+    sock.send("LSTE\n".encode("utf-8"))
+    data = read_till_msg(sock, b"215 End of EPG data\r\n")
+
+    # close connection
+    sock.send("QUIT\n".encode("utf-8"))
+
+    return data
+
+
+def parse_epg_data(data):
+    """
+    Parses EPG data and store interesting programs in a list.
+    Each program will become a dictionary containg the keys from VDR's epg.data
+    file definition http://www.vdr-wiki.de/wiki/index.php/Epg.data
+    'TableID' and 'Version' from key 'E' are left out since their rapid changes
+    for no apparent reason will cause unintended cache misses.
+    """
+    all_programs = []
+    for line in data.split("\n"):
+        if len(line) < 5:
+            continue
+        # print(len(line), line[4:])
+        hdr = line[4]
+        if hdr == "C":  # start of a new channel section
+            channel = line[6:]
+        elif hdr == "c":  # end of a channel secion
+            pass
+        elif hdr == "E":  # start of a new program
+            program = {"E": line[6:].rsplit(" ", 2)[0]}
+        elif hdr in "TSDGRV":  # program description
+            program[hdr] = line[6:]
+        elif hdr == "X":  # streams (can occur many times)
+            if "X" not in program:
+                program["X"] = []
+            program["X"].append(line[6:])
+        elif hdr == "e":  # end of a program description
+            program["C"] = channel
+            all_programs.append(program)
+        else:
+            raise Exception("Got unexpected line: " + line)
+    return all_programs
 
 
 def programlist_to_html(program_list, link_base=None):
@@ -323,59 +394,23 @@ def main():
     else:
         cache = []
 
-    # make socket connection to VDR
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    host = config["vdrhost"]
-    port = config["vdrport"]
-    sock.connect((host, port))
-    sock.settimeout(10)
+    # get EPG data
+    data = get_epg_data(config)
 
-    # get and check VDR's greeting message
-    data = read_till_msg(sock, "\n".encode())
-    if not data.startswith("220 "):
-        raise Exception("Got unexpected greeting message: " + data)
-    if not data.endswith("UTF-8\r\n"):
-        raise Exception("Encoding does not seem to be UTF-8")
-
-    # request EPG data
-    sock.send("LSTE\n".encode("utf-8"))
-    data = read_till_msg(sock, b"215 End of EPG data\r\n")
-
-    # close connection
-    sock.send("QUIT\n".encode("utf-8"))
-
+    # write EPG data to file if requested
     if args.epg_dst_file:
         with open(args.epg_dst_file, "w") as f:
             f.write(data)
 
-    # parse EPG data and store interesting programs in a list
+    # parse EPG data to list of programms
+    all_programs = parse_epg_data(data)
+
+    # check for interesting programs
     program_list = []
-    all_programs = []
-    for line in data.split("\n"):
-        if len(line) < 5:
-            continue
-        # print(len(line), line[4:])
-        hdr = line[4]
-        if hdr == "C":  # start of a new channel section
-            channel = line[6:]
-        elif hdr == "c":  # end of a channel secion
-            pass
-        elif hdr == "E":  # start of a new program
-            program = {"E": line[6:].rsplit(" ", 2)[0]}
-        elif hdr in "TSDGRV":  # program description
-            program[hdr] = line[6:]
-        elif hdr == "X":  # streams (can occur many times)
-            if "X" not in program:
-                program["X"] = []
-            program["X"].append(line[6:])
-        elif hdr == "e":  # end of a program description
-            program["C"] = channel
-            all_programs.append(program)
-            if check_program(program, config) and program not in cache:
-                # print(program)
-                program_list.append(program)
-        else:
-            raise Exception("Got unexpected line: " + line)
+    for program in all_programs:
+        if check_program(program, config) and program not in cache:
+            # print(program)
+            program_list.append(program)
 
     # convert to nice HTML table
     if "vdradmin_link" in config:
