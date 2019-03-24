@@ -191,10 +191,10 @@ def programlist_to_html(program_list, link_base=None):
 
     HTML_hdr = """
     <!DOCTYPE html>
-    <html xmlns="http://www.w3.org/1999/xhtml">
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <style type="text/css">
+    <style>
     ul {padding-left:2em;}
     table {width: 100%}
     td {text-align: center;}
