@@ -11,6 +11,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import argparse
+import unicodedata
 
 
 def setup_parser():
@@ -64,7 +65,7 @@ def norm_str(s):
     return NFD(NFD(s).casefold())
 
 
-def norm_str_in(s1, s2):
+def str_in(s1, s2):
     """
     Checks if string s1 is in s2. Check is done after normalization and casefolding.
 
@@ -77,7 +78,7 @@ def norm_str_in(s1, s2):
     return norm_str(s1) in norm_str(s2)
 
 
-def norm_str_eq(s1, s2):
+def str_eq(s1, s2):
     """
     Checks if string s1 and s2 are equal. Check is done after normalization and casefolding.
 
@@ -296,51 +297,55 @@ def programlist_to_html(program_list, link_base=None):
 
 def check_program(program, search_config):
 
+    # TODO: keys in program and search config are normalized every time a str_*
+    # function is called. Maybe caching the normalized strings will enhance
+    # execution speed.
+
     T = program["T"]
 
     # title blacklist
     if "notitle" in search_config:
         for t in search_config["notitle"]:
-            if t == T:
+            if str_eq(t, T):
                 return False
 
     # channel blacklist
     if "nochannel" in search_config:
         for noC in search_config["nochannel"]:
-            if noC in program["C"]:
+            if str_eq(noC, program["C"]):
                 return False
 
     # title match
     for t in search_config["title"]:
-        if t == T:
+        if str_eq(t, T):
             program["hit"] = "title " + t
             return True
 
     # in title
     for t in search_config["intitle"]:
         # just detect title
-        if type(t) == str and t in T:
+        if type(t) == str and str_in(t, T):
             program["hit"] = "intitle " + t
             return True
 
         # title detection with blacklist
-        if type(t) == dict and t["intitle"] in T:
+        if type(t) == dict and str_in(t["intitle"], T):
             # if search has subtitle blacklist and program has subtitle
             if "notintitle" in t:
                 for notintitle in t["notintitle"]:
-                    if notintitle in T:
+                    if str_in(notintitle, T):
                         return False
             if "notinsubtitle" in t and "S" in program:
                 for nosub in t["notinsubtitle"]:
-                    if nosub in program["S"]:
+                    if str_in(nosub, program["S"]):
                         return False
             if "nosubtitle" in t and "S" in program:
                 for nosub in t["nosubtitle"]:
-                    if nosub == program["S"]:
+                    if str_eq(nosub, program["S"]):
                         return False
             if "notitle" in t:
                 for notitle in t["notitle"]:
-                    if notitle == T:
+                    if str_eq(notitle, T):
                         return False
 
             program["hit"] = "title " + t["intitle"]
@@ -349,7 +354,7 @@ def check_program(program, search_config):
     # in subtitle
     if "insubtitle" in search_config and "S" in program:
         for t in search_config["insubtitle"]:
-            if t in program["S"]:
+            if str_in(t, program["S"]):
                 program["hit"] = "insubtitle"
                 return True
 
@@ -357,7 +362,7 @@ def check_program(program, search_config):
     if "indescription" in search_config and "D" in program:
         for t in search_config["indescription"]:
             # detect string in description
-            if t in program["D"]:
+            if str_in(t, program["D"]):
                 program["hit"] = "indescription " + t
                 return True
 
