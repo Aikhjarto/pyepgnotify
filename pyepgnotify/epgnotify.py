@@ -189,33 +189,34 @@ def programlist_to_html(program_list, link_base=None):
     Generates nicely formatted HTML file from list of programs.
     """
 
-    HTML_hdr = """
-    <!DOCTYPE html>
-    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-    <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <style>
-    ul {padding-left:2em;}
-    table {width: 100%}
-    td {text-align: center;}
-    td.lft {text-align: left;}
-    table, th, td { border: 1px solid black; }
-    </style>
-    <title>epgnotify list</title>
-    </head>
-    <body>
-    <table>
-    <tr>
-    <th><b>Channel</b></th>
-    <th><b>Program</b></th>
-    <th><b>Description</b></th>
-    <th><b>Match</b></th>
-    <th><b>Streams</b></th>
-    </tr>
-    """
+    HTML_hdr = """<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+ul {padding-left:2em;}
+table {width: 100%}
+td {text-align: center;}
+td.lft {text-align: left;}
+table, th, td { border: 1px solid black; }
+</style>
+<title>epgnotify list</title>
+</head>
+<body>
+<table>
+<tr>
+<th><b>Channel</b></th>
+<th><b>Program</b></th>
+<th><b>Description</b></th>
+<th><b>Match</b></th>
+<th><b>Streams</b></th>
+</tr>
+"""
 
-    HTML_ftr = """
-    </table></body></html>"""
+    HTML_ftr = """</table>
+</body>
+</html>
+"""
 
     lst = []
     for p in program_list:
