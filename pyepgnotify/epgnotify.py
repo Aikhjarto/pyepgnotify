@@ -269,7 +269,7 @@ def programlist_to_html(program_list, link_base=None):
         s = "<td><ul>"
         if "X" in p:
             for x in p["X"]:
-                s += "<li>{}/<li>".format(x)
+                s += "<li>{}</li>".format(x)
         s += "</ul></td>"
         lst.append(s)
 
