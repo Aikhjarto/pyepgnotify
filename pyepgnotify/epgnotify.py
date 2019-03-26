@@ -88,6 +88,8 @@ def str_eq(s1, s2):
         True if strings are equal after normalization and casefolding.
     """
 
+    return norm_str(s1) == norm_str(s2)
+
 
 def read_till_msg(sock, msg):
     """
