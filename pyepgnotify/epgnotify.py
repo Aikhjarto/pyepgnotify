@@ -318,6 +318,12 @@ def check_program(program, search_config):
             if str_eq(noC, program["C"]):
                 return False
 
+    # inchannel blacklist
+    if "notinchannel" in search_config:
+        for noC in search_config["notinchannel"]:
+            if str_in(noC, program["C"]):
+                return False
+
     # title match
     for t in search_config["title"]:
         if str_eq(t, T):
