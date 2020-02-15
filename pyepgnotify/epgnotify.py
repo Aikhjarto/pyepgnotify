@@ -171,6 +171,8 @@ def parse_epg_data(data):
         elif hdr == "c":  # end of a channel secion
             pass
         elif hdr == "E":  # start of a new program
+            # last two values are database IDs which might change without an
+            # actual change of the program. Thus strip the last two values.
             program = {"E": line[6:].rsplit(" ", 2)[0]}
         elif hdr in "TSDGRV":  # program description
             program[hdr] = line[6:]
@@ -304,7 +306,12 @@ def check_program(program, search_config):
     # function is called. Maybe caching the normalized strings will enhance
     # execution speed.
 
-    T = program["T"]
+    try:
+        T = program["T"]
+    except KeyError as e:
+        print('Program has no "T":', program)
+        raise e
+
 
     # title blacklist
     if "notitle" in search_config:
@@ -406,6 +413,69 @@ def send_email(HTML_string, subject_string, config):
     smtp.close()
 
 
+def in_ignore_hit(c, all_programs):
+    """
+    Checks a cache item c if it is present in list of all programs.
+    Cache item will have key 'hit' that might not be present in a program.
+    Thus, `c['hit']` is ignored in check.
+
+    Parameters
+    ----------
+    c : dict
+        Program from cache (including a key 'hit')
+
+    all_programs : list
+        List of programs from EPG data. Must not include a key 'hit'.
+
+    Returns
+    -------
+    bool :
+        True if cache item 'c' is in EPG data 'all_programs'.
+    """
+
+    # exclude 'hit' from comparison as it is in cache but not in list
+    # of programs
+    c_no_hit={}
+    for key in c.keys():
+        if key != 'hit':
+            c_no_hit[key]=c[key]
+
+    return c in all_programs
+
+
+def purge_cache(cache,all_programs):
+    """
+    Checks cache against list of programs and removes entries from cache that
+    are not in list of programs any more.
+
+    Parameters
+    ----------
+    cache : list
+        List of programs from cache
+
+    all_programs : list
+        List of all programs from epg data.
+
+    Returns
+    -------
+    cache_new : list
+        New cache, bar old programs that have already been aired.
+    """
+
+    # TODO: some TV stations send epg-data erratically, i.e. in consecutive 
+    # EPG scans a program might be missing at one point and delete from cache.
+    # Once the program reapperas it will look as new since it was purged from
+    # the cache in the previous run and the user will be notified multiple 
+    # times. Thus, a cache retention of a few days might be required.
+
+    cache_new=[]
+    for c in cache:
+        if in_ignore_hit(c,all_programs):
+            cache_new.append(c)
+
+    return cache_new
+
+
 def main():
     parser = setup_parser()
     args = parser.parse_args()
@@ -446,6 +516,8 @@ def main():
     # check for interesting programs
     program_list = []
     for program in all_programs:
+        # Hint: check_programm adds new key 'hit' to relevant programs, which 
+        # is also in cache.
         if check_program(program, config) and program not in cache:
             # print(program)
             program_list.append(program)
@@ -471,7 +543,7 @@ def main():
 
     # prevent infinitely growing cache by purging
     # programs from cache that are not in EPG data any more
-    cache = [c for c in cache if c not in all_programs]
+    cache = purge_cache(cache, all_programs)
 
     # add currently found programs to cache
     cache.extend(program_list)
