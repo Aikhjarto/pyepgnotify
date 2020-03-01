@@ -363,6 +363,10 @@ def check_program(program, search_config):
                 for notitle in t["notitle"]:
                     if str_eq(notitle, T):
                         return False
+            if "notinchannel" in t:
+                for nochannel in t["notinchannel"]:
+                    if str_in(nochannel, program["C"]):
+                        return False
 
             program["hit"] = "title " + t["intitle"]
             return True
