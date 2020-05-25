@@ -493,7 +493,7 @@ def main():
     else:
         filename = args.config
     with open(filename, "r") as f:
-        config = yaml.load(f)
+        config = yaml.safe_load(f)
 
     # load cache (already sent notifications)
     if not args.cache_file:
@@ -502,7 +502,7 @@ def main():
         cache_file = args.cache_file
     if os.path.isfile(cache_file):
         with open(cache_file, "r") as f:
-            cache = yaml.load(f)
+            cache = yaml.safe_load(f)
     else:
         cache = []
 
