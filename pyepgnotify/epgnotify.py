@@ -309,9 +309,9 @@ def check_program(program, search_config):
     try:
         T = program["T"]
     except KeyError as e:
-        print('Program has no "T":', program)
-        raise e
-
+        # print('Program has no "T":', program)
+        # channel with no title is valid EPG but has no futher usage
+        return False
 
     # title blacklist
     if "notitle" in search_config:
