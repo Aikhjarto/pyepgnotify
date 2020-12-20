@@ -62,7 +62,13 @@ def norm_str(s):
     def NFD(s):
         return unicodedata.normalize("NFD", s)
 
-    return NFD(NFD(s).casefold())
+    try:
+        return NFD(NFD(s).casefold())
+    except TypeError as ex:
+        # unparseable data is often caused by errors in config file
+        # print unparseable data so users can see where the error is
+        print('Cannot normalize %s' % str(s), file=sys.stderr)
+        raise ex
 
 
 def str_in(s1, s2):
