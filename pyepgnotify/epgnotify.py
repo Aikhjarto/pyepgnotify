@@ -50,6 +50,14 @@ def setup_parser():
         help="Store received EPG data to a file",
     )
 
+    parser.add_argument(
+        "--no-cache-write",
+        action="store_true",
+        default=False,
+        help="If given, cache is not written, which is usefull for reproducible test-cases.",
+    )
+
+
     return parser
 
 
@@ -561,9 +569,10 @@ def main():
     # sort cache (makes it much easier to debug)
     cache = sorted(cache, key=lambda k: k["E"])
 
-    # write cache
-    with open(cache_file, "w") as f:
-        yaml.dump(cache, f, allow_unicode=True)
+    if not args.no_cache_write:
+        # write cache
+        with open(cache_file, "w") as f:
+            yaml.dump(cache, f, allow_unicode=True)
 
 
 if __name__ == "__main__":
