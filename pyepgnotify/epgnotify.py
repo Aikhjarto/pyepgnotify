@@ -5,7 +5,6 @@ import os
 from pathlib import Path  # requires python 3.5
 import sys
 import yaml
-import struct
 import time
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -56,7 +55,6 @@ def setup_parser():
         default=False,
         help="If given, cache is not written, which is usefull for reproducible test-cases.",
     )
-
 
     return parser
 
@@ -468,15 +466,15 @@ def in_ignore_hit(c, all_programs):
 
     # exclude 'hit' from comparison as it is in cache but not in list
     # of programs
-    c_no_hit={}
+    c_no_hit = {}
     for key in c.keys():
         if key != 'hit':
-            c_no_hit[key]=c[key]
+            c_no_hit[key] = c[key]
 
     return c in all_programs
 
 
-def purge_cache(cache,all_programs):
+def purge_cache(cache, all_programs):
     """
     Checks cache against list of programs and removes entries from cache that
     are not in list of programs any more.
@@ -495,15 +493,15 @@ def purge_cache(cache,all_programs):
         New cache, bar old programs that have already been aired.
     """
 
-    # TODO: some TV stations send epg-data erratically, i.e. in consecutive 
+    # TODO: some TV stations send epg-data erratically, i.e. in consecutive
     # EPG scans a program might be missing at one point and delete from cache.
     # Once the program reapperas it will look as new since it was purged from
-    # the cache in the previous run and the user will be notified multiple 
+    # the cache in the previous run and the user will be notified multiple
     # times. Thus, a cache retention of a few days might be required.
 
-    cache_new=[]
+    cache_new = []
     for c in cache:
-        if in_ignore_hit(c,all_programs):
+        if in_ignore_hit(c, all_programs):
             cache_new.append(c)
 
     return cache_new
@@ -549,7 +547,7 @@ def main():
     # check for interesting programs
     program_list = []
     for program in all_programs:
-        # Hint: check_programm adds new key 'hit' to relevant programs, which 
+        # Hint: check_programm adds new key 'hit' to relevant programs, which
         # is also in cache.
         if check_program(program, config) and program not in cache:
             # print(program)
