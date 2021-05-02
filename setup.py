@@ -18,7 +18,7 @@ setup(
     description="Reads EPG data from VDR and sends user notification mails when desired programs are found",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    classifies=[
+    classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3",
     ],
