@@ -314,6 +314,34 @@ table, th, td { border: 1px solid black; }
 #    }
 
 
+def _check_blacklist(program, t, T):
+    """
+    Helper function to check_program()
+    """
+    # if search has subtitle blacklist and program has subtitle
+    if "notintitle" in t:
+        for notintitle in t["notintitle"]:
+            if str_in(notintitle, T):
+                return False
+    if "notinsubtitle" in t and "S" in program:
+        for nosub in t["notinsubtitle"]:
+            if str_in(nosub, program["S"]):
+                return False
+    if "nosubtitle" in t and "S" in program:
+        for nosub in t["nosubtitle"]:
+            if str_eq(nosub, program["S"]):
+                return False
+    if "notitle" in t:
+        for notitle in t["notitle"]:
+            if str_eq(notitle, T):
+                return False
+    if "notinchannel" in t:
+        for nochannel in t["notinchannel"]:
+            if str_in(nochannel, program["C"]):
+                return False
+    return True
+
+
 def check_program(program, search_config):
 
     # TODO: keys in program and search config are normalized every time a str_*
@@ -347,9 +375,16 @@ def check_program(program, search_config):
 
     # title match
     for t in search_config["title"]:
-        if str_eq(t, T):
+        # just detect title
+        if type(t) == str and str_eq(t, T):
             program["hit"] = "title " + t
             return True
+
+        # title detection with blacklist
+        if type(t) == dict and str_eq(t['title'], T):
+            if _check_blacklist(program, t, T):
+                program["hit"] = "title " + t["intitle"]
+                return True
 
     # in title
     for t in search_config["intitle"]:
@@ -361,29 +396,9 @@ def check_program(program, search_config):
         # title detection with blacklist
         if type(t) == dict and str_in(t["intitle"], T):
             # if search has subtitle blacklist and program has subtitle
-            if "notintitle" in t:
-                for notintitle in t["notintitle"]:
-                    if str_in(notintitle, T):
-                        return False
-            if "notinsubtitle" in t and "S" in program:
-                for nosub in t["notinsubtitle"]:
-                    if str_in(nosub, program["S"]):
-                        return False
-            if "nosubtitle" in t and "S" in program:
-                for nosub in t["nosubtitle"]:
-                    if str_eq(nosub, program["S"]):
-                        return False
-            if "notitle" in t:
-                for notitle in t["notitle"]:
-                    if str_eq(notitle, T):
-                        return False
-            if "notinchannel" in t:
-                for nochannel in t["notinchannel"]:
-                    if str_in(nochannel, program["C"]):
-                        return False
-
-            program["hit"] = "title " + t["intitle"]
-            return True
+            if _check_blacklist(program, t, T):
+                program["hit"] = "title " + t["intitle"]
+                return True
 
     # in subtitle
     if "insubtitle" in search_config and "S" in program:
