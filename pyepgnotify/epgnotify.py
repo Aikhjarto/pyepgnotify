@@ -11,7 +11,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import argparse
 import unicodedata
+import logging
+import getpass
 
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 def setup_parser():
 
@@ -55,6 +59,9 @@ def setup_parser():
         default=False,
         help="If given, cache is not written, which is usefull for reproducible test-cases.",
     )
+
+    parser.add_argument("-v", "--verbose", dest="verbosity", type=int, default=30,
+            help="Set verbosity according to python's logging level, i.e. CRITICAL=50, ERROR=40, WARNING=30, INFO=20, DEBUG=10")
 
     return parser
 
@@ -510,10 +517,12 @@ def purge_cache(cache, all_programs):
 def main():
     parser = setup_parser()
     args = parser.parse_args()
+    logger.setLevel(args.verbosity)
 
     # with open('search_config.yml', 'w') as outfile:
     #    yaml.dump(search_config, outfile, default_flow_style=False, allow_unicode=True)
 
+    logger.info("Loading config and caches")
     # load config
     if not args.config:
         filename = os.path.join(str(Path.home()), "epgnotify.yml")
@@ -534,6 +543,7 @@ def main():
         cache = []
 
     # get EPG data
+    logger.info("Get EPG data from vdr")
     data = get_epg_data(config)
 
     # write EPG data to file if requested
@@ -545,6 +555,7 @@ def main():
     all_programs = parse_epg_data(data)
 
     # check for interesting programs
+    logger.info("Checking for interesting programms")
     program_list = []
     for program in all_programs:
         # Hint: check_programm adds new key 'hit' to relevant programs, which
@@ -554,6 +565,7 @@ def main():
             program_list.append(program)
 
     # convert to nice HTML table
+    logger.info("Generate output")
     if "vdradmin_link" in config:
         link_base = config["vdradmin_link"]
     else:
@@ -566,6 +578,7 @@ def main():
 
     # send via mail
     if "email" in config:
+        logger.info("Send mail")
         subject_string = "epgnotify found {} new programs for you".format(
             len(program_list)
         )
