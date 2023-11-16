@@ -76,7 +76,7 @@ def norm_str(s):
         return unicodedata.normalize("NFD", s)
 
     try:
-        return NFD(NFD(s).casefold())
+        return NFD(NFD(str(s)).casefold())
     except TypeError as ex:
         # unparseable data is often caused by errors in config file
         # print unparseable data so users can see where the error is
