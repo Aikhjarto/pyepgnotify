@@ -429,13 +429,12 @@ def send_email(HTML_string, subject_string, config):
     if "from_email" in config:
         sender = config["from_email"]
     else:
-        sender = config["email"]
+        sender = getpass.getuser()+"@"+socket.getfqdn()
 
     receiver = config["email"]
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject_string
-    msg["From"] = sender
     msg["To"] = receiver
 
     # text='See HTML'
@@ -446,7 +445,7 @@ def send_email(HTML_string, subject_string, config):
     part2 = MIMEText(HTML_string, "html")
     msg.attach(part2)
 
-    smtp = smtplib.SMTP("localhost")
+    smtp = smtplib.SMTP(config.get("smtphost", "localhost"))
     smtp.sendmail(sender, receiver, msg.as_string())
     smtp.close()
 
