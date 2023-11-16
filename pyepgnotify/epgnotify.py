@@ -181,7 +181,7 @@ def parse_epg_data(data):
     """
     all_programs = []
     for line in data.split("\n"):
-        if len(line) < 5:
+        if len(line) < 5 or not line.startswith('215-'):
             continue
         # print(len(line), line[4:])
         hdr = line[4]
