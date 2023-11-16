@@ -400,7 +400,7 @@ def check_program(program, search_config):
         # title detection with blacklist
         if type(t) == dict and str_eq(t['title'], T):
             if _check_blacklist(program, t, T):
-                program["hit"] = "title " + t["intitle"]
+                program["hit"] = "title " + t["title"]
                 return True
 
     # in title
