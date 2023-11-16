@@ -222,6 +222,10 @@ table {width: 100%}
 td {text-align: center;}
 td.lft {text-align: left;}
 table, th, td { border: 1px solid black; }
+.longlink {
+  color: inherit;
+  text-decoration: inherit;
+}
 </style>
 <title>epgnotify list</title>
 </head>
@@ -256,20 +260,28 @@ table, th, td { border: 1px solid black; }
         starttime = time.asctime(time.localtime(starttime))
         # add channel info
         cid, cname = p["C"].split(" ", 1)
-        s = "<td>{}<br><b>{}</b><br>{}</td>".format(cid, cname, eid)
+
+        link_target = f'{link_base}/vdradmin.pl?aktion=timer_new_form&epg_id={eid}&channel_id={cid}&referer=Li92ZHJhZG1pbi5wbD9ha3Rpb249dGltZXJfbGlzdA=='
+        # "Li92ZHJhZG1pbi5wbD9ha3Rpb249dGltZXJfbGlzdA=="" is base64 encoded for "./vdradmin.pl?aktion=timer_list"
+
+        s = f"<td>{cid}<br><b>{cname}</b><br>{eid}</td>"
         lst.append(s)
 
         # add program info
-        s = "<td>{}<br><b>{}</b><br>".format(starttime, p["T"])
+        s = "<td>"
+        if link_base:
+            s+= f'<a class="longlink" href="{link_target}">'
+        s+=f'<div>{starttime}<br><b>{p["T"]}</b><br>'
         if "G" in p:
-            s += "Genre: {}<br>".format(p["G"])
-        s += "Duration (min): {}".format(int(duration // 60))
+            s += f'Genre: {p["G"]}<br>'
 
-        s += '<br><a href="{}/vdradmin.pl?aktion=timer_new_form&epg_id={}&channel_id={}&referer={}">Link to vdradmin-am</a>'.format(
-            link_base, int(eid), cid, "Li92ZHJhZG1pbi5wbD9ha3Rpb249dGltZXJfbGlzdA=="
-        )
-        # Li92ZHJhZG1pbi5wbD9ha3Rpb249dGltZXJfbGlzdA== is base64 encoded
-        # for "./vdradmin.pl?aktion=timer_list"
+        hours, remainder = divmod(duration, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        s += f"Duration: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+
+        s += '</div>'
+        if link_base:
+            s+=f'</a><a href="{link_target}">Link to vdradmin-am</a>'
 
         s += "</td>"
         lst.append(s)
