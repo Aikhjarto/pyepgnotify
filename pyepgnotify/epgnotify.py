@@ -324,6 +324,10 @@ def _check_blacklist(program, t, T):
     Helper function to check_program()
     """
     # if search has subtitle blacklist and program has subtitle
+    if "notinchannel" in t:
+        for nochannel in t["notinchannel"]:
+            if str_in(nochannel, program["C"]):
+                return False
     if "notintitle" in t:
         for notintitle in t["notintitle"]:
             if str_in(notintitle, T):
@@ -332,17 +336,25 @@ def _check_blacklist(program, t, T):
         for nosub in t["notinsubtitle"]:
             if str_in(nosub, program["S"]):
                 return False
-    if "nosubtitle" in t and "S" in program:
-        for nosub in t["nosubtitle"]:
-            if str_eq(nosub, program["S"]):
+    if "notindescription" in t and "D" in program:
+        for nodesc in t["notindescription"]:
+            if str_in(nodesc, program["D"]):
+                return False
+    if "nochannel" in t:
+        for nochannel in t["nochannel"]:
+            if str_eq(nochannel, program["C"]):
                 return False
     if "notitle" in t:
         for notitle in t["notitle"]:
             if str_eq(notitle, T):
                 return False
-    if "notinchannel" in t:
-        for nochannel in t["notinchannel"]:
-            if str_in(nochannel, program["C"]):
+    if "nosubtitle" in t and "S" in program:
+        for nosub in t["nosubtitle"]:
+            if str_eq(nosub, program["S"]):
+                return False
+    if "nodescription" in t:
+        for nodesc in t["nodescription"]:
+            if str_eq(nodesc, program["D"]):
                 return False
     return True
 
