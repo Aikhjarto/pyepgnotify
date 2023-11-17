@@ -8,7 +8,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="pyepgnotify",
-    version="0.2.0",
+    version="0.2.1",
     license="GPLv3",
     url="https://github.com/Aikhjarto/pyepgnotify.git",
     download_url="https://github.com/Aikhjarto/pyepgnotify/archive/v0.2.0.tar.gz",
@@ -23,8 +23,9 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     packages=find_packages(),
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     install_requires=["pyyaml"],
     entry_points={"console_scripts": ["pyepgnotify=pyepgnotify.epgnotify:main"]},
-    data_files=[("pyepgnotify", ["epgnotify.yml"])],
+    #data_files=[("pyepgnotify", ["epgnotify.yml"])],
+    package_data={"pyepgnotify": ["*.yml",]},
 )
