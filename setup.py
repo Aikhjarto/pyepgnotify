@@ -8,10 +8,10 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="pyepgnotify",
-    version="0.1.4",
+    version="0.2.0",
     license="GPLv3",
     url="https://github.com/Aikhjarto/pyepgnotify.git",
-    download_url="https://github.com/Aikhjarto/pyepgnotify/archive/v0.1.4.tar.gz",
+    download_url="https://github.com/Aikhjarto/pyepgnotify/archive/v0.2.0.tar.gz",
     keywords=["VDR", "EPG", "mail", "notification"],
     author="Thomas Wagner",
     author_email="wagner-thomas@gmx.at",
